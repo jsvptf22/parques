@@ -1,0 +1,27 @@
+# Headers for static assets
+/assets/*.css
+  Content-Type: text/css
+
+/assets/*.js
+  Content-Type: application/javascript
+
+/assets/*.json
+  Content-Type: application/json
+
+/assets/*.svg
+  Content-Type: image/svg+xml
+
+/assets/*.png
+  Content-Type: image/png
+
+/assets/*.jpg
+  Content-Type: image/jpeg
+
+/assets/*.jpeg
+  Content-Type: image/jpeg
+
+/assets/*.woff
+  Content-Type: font/woff
+
+/assets/*.woff2
+  Content-Type: font/woff2
