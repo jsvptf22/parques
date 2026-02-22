@@ -1,5 +1,6 @@
 import React from "react";
 import type { Piece, Player, PlayerColor } from "../types";
+import "./Board.css";
 
 interface BoardProps {
   players: Player[];
@@ -84,7 +85,7 @@ const Board: React.FC<BoardProps> = ({
             return (
               <div
                 key={piece.id}
-                className={`piece ${color} ${isValidMove && canMove ? "valid-move" : ""}`}
+                className={`piece piece-in-jail ${color} ${isValidMove && canMove ? "valid-move" : ""}`}
                 onClick={() =>
                   canMove && isValidMove && onPieceClick(player.id, piece.id)
                 }
@@ -122,7 +123,7 @@ const Board: React.FC<BoardProps> = ({
                 return (
                   <div
                     key={piece.id}
-                    className={`piece ${color} ${isValidMove && canMove ? "valid-move" : ""}`}
+                    className={`piece piece-in-home ${color} ${isValidMove && canMove ? "valid-move" : ""}`}
                     onClick={() =>
                       canMove &&
                       isValidMove &&
@@ -141,7 +142,7 @@ const Board: React.FC<BoardProps> = ({
           {player.pieces
             .filter((p) => p.isFinished)
             .map((piece) => (
-              <div key={piece.id} className={`piece ${color} finished`} />
+              <div key={piece.id} className={`piece piece-finished ${color}`} />
             ))}
         </div>
       </div>
@@ -187,6 +188,12 @@ const Board: React.FC<BoardProps> = ({
             <div className="parques-title">PARQUÉS</div>
           </div>
         </div>
+      </div>
+
+      {/* Dados decorativos en el tablero */}
+      <div className="decorative-dice-container">
+        <div className="decorative-dice">⚀</div>
+        <div className="decorative-dice">⚅</div>
       </div>
     </div>
   );

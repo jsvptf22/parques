@@ -159,11 +159,30 @@ function App() {
               <div className="rules-box">
                 <h3>Reglas Tradicionales</h3>
                 <ul>
-                  <li>🎲 Necesitas sacar 5 para salir de la cárcel</li>
-                  <li>🔄 Si sacas 5 o 6, vuelves a tirar</li>
+                  <li>🎲 Se juega con 2 dados</li>
+                  <li>
+                    🔓 Para salir: saca dobles (1-1, 2-2, 3-3, 4-4, 5-5, 6-6)
+                  </li>
+                  <li>
+                    🚀 Al sacar dobles, TODAS tus fichas salen de la cárcel
+                  </li>
+                  <li>
+                    🎯 Si todas tus fichas están en la cárcel, tienes 3 intentos
+                    para sacar dobles
+                  </li>
+                  <li>
+                    ⚡ Si tienes al menos 1 ficha fuera, solo tienes 1 intento
+                    por turno
+                  </li>
+                  <li>🔄 Vuelves a tirar solo si sacas dobles</li>
+                  <li>
+                    🎆 Tres pares consecutivos: una ficha va directo a la meta
+                  </li>
                   <li>💥 Captura fichas enemigas y envíalas a la cárcel</li>
-                  <li>⭐ Las casillas seguras te protegen</li>
-                  <li>🏁 Debes llegar a la meta con el número exacto</li>
+                  <li>
+                    ⭐ Las casillas seguras te protegen (no puedes ser comido)
+                  </li>
+                  <li>🎯 Para llegar a la meta necesitas el número EXACTO</li>
                   <li>🏆 El primero en meter sus 4 fichas gana</li>
                 </ul>
               </div>
@@ -277,23 +296,47 @@ function App() {
         </div>
 
         <div className="dice-section">
-          <div className={`dice ${diceRoll ? "rolled" : ""}`}>
-            {diceRoll ? renderDiceFace(diceRoll.value) : "🎲"}
+          <div className="dice-container-double">
+            <div className={`dice ${diceRoll ? "rolled" : ""}`}>
+              {diceRoll ? renderDiceFace(diceRoll.dice1) : "🎲"}
+            </div>
+            <div className={`dice ${diceRoll ? "rolled" : ""}`}>
+              {diceRoll ? renderDiceFace(diceRoll.dice2) : "🎲"}
+            </div>
           </div>
+          {diceRoll && (
+            <div className="dice-total">Total: {diceRoll.total}</div>
+          )}
           <button
             onClick={handleRollDice}
             disabled={!canRollDice}
             className={`btn btn-dice ${canRollDice ? "pulse" : ""}`}
           >
             {canRollDice
-              ? "Tirar Dado"
+              ? "Tirar Dados"
               : isMyTurn
                 ? "Mueve una ficha"
                 : "Esperando..."}
           </button>
-          {diceRoll?.canRollAgain && (
-            <div className="bonus-roll">¡Tiras de nuevo! 🎉</div>
+          {diceRoll?.threeDoublesReward && (
+            <div className="three-doubles-message">
+              ¡¡¡TRES PARES!!! 🎆 Ficha a la meta!
+            </div>
           )}
+          {diceRoll?.releasedFromJail && !diceRoll?.threeDoublesReward && (
+            <div className="released-message">¡Fichas liberadas! 🎊</div>
+          )}
+          {diceRoll?.attemptsRemaining !== undefined &&
+            diceRoll.attemptsRemaining > 0 && (
+              <div className="attempts-remaining">
+                Intentos restantes: {diceRoll.attemptsRemaining}
+              </div>
+            )}
+          {diceRoll?.canRollAgain &&
+            !diceRoll?.releasedFromJail &&
+            !diceRoll?.threeDoublesReward && (
+              <div className="bonus-roll">¡Tiras de nuevo! 🎉</div>
+            )}
         </div>
       </div>
 

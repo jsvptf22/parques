@@ -15,11 +15,18 @@ export interface Player {
   pieces: Piece[];
   isActive: boolean;
   consecutiveTurns: number;
+  consecutiveDoubles: number;
+  rollAttempts: number;
 }
 
 export interface DiceRoll {
-  value: number;
+  dice1: number;
+  dice2: number;
+  total: number;
   canRollAgain: boolean;
+  releasedFromJail?: boolean;
+  threeDoublesReward?: boolean;
+  attemptsRemaining?: number;
 }
 
 export interface GameState {

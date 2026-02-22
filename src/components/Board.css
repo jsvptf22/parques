@@ -1,0 +1,874 @@
+/* ===================================
+   TABLERO DE PARQUÉS TRADICIONAL COLOMBIANO
+   Vista cenital con acabados de madera
+   =================================== */
+
+/* Contenedor principal del tablero */
+.board-container {
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  padding: 0.5vh;
+  margin: 0;
+  box-sizing: border-box;
+  position: relative;
+  background: radial-gradient(circle at 30% 30%, #2c1810, #1a0f08);
+  border-radius: 12px;
+  box-shadow: 
+    0 10px 30px rgba(0, 0, 0, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 0 0 2px rgba(139, 90, 60, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Wrapper del tablero - forma de cruz */
+.board-wrapper {
+  width: 100%;
+  height: 100%;
+  max-width: min(90vh, 90vw);
+  max-height: min(90vh, 90vw);
+  aspect-ratio: 1;
+  margin: auto;
+  display: grid;
+  grid-template-columns: 1fr 3fr 1fr;
+  grid-template-rows: 1fr 3fr 1fr;
+  gap: 3px;
+  background: linear-gradient(145deg, #8B5A3C 0%, #6B4423 50%, #52341F 100%);
+  border-radius: 12px;
+  padding: 8px;
+  box-shadow: 
+    inset 0 4px 12px rgba(0, 0, 0, 0.4),
+    inset 0 -2px 8px rgba(255, 255, 255, 0.1),
+    0 8px 24px rgba(0, 0, 0, 0.5);
+  position: relative;
+}
+
+/* Textura de madera simulada */
+.board-wrapper::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.03) 2px,
+      rgba(0, 0, 0, 0.03) 4px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 40px,
+      rgba(139, 90, 60, 0.1) 40px,
+      rgba(139, 90, 60, 0.1) 42px
+    );
+  border-radius: 16px;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+/* ===================================
+   ESQUINAS - CÁRCELES (Jails)
+   =================================== */
+
+.corner {
+  background: radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.08), transparent);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  gap: 4px;
+  position: relative;
+  border: 2px solid rgba(0, 0, 0, 0.3);
+  box-shadow: 
+    inset 0 2px 8px rgba(0, 0, 0, 0.3),
+    inset 0 -1px 4px rgba(255, 255, 255, 0.1);
+}
+
+/* Cárceles circulares con colores sólidos */
+.jail {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 6px;
+  position: relative;
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.5),
+    inset 0 2px 6px rgba(255, 255, 255, 0.2),
+    inset 0 -4px 8px rgba(0, 0, 0, 0.3);
+  border: 4px solid rgba(0, 0, 0, 0.2);
+}
+
+/* Colores sólidos de las cárceles */
+.jail.red {
+  background: radial-gradient(circle at 35% 35%, #FF6B6B, #E63946);
+  border-color: #B42B37;
+}
+
+.jail.blue {
+  background: radial-gradient(circle at 35% 35%, #5DADE2, #457B9D);
+  border-color: #34597A;
+}
+
+.jail.yellow {
+  background: radial-gradient(circle at 35% 35%, #F6C453, #F4A261);
+  border-color: #C98243;
+}
+
+.jail.green {
+  background: radial-gradient(circle at 35% 35%, #45D9B8, #2A9D8F);
+  border-color: #1F7A6F;
+}
+
+/* Etiquetas de las cárceles */
+.jail-label {
+  font-size: 0.55rem;
+  font-weight: 900;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.95);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-shadow: 
+    0 1px 2px rgba(0, 0, 0, 0.8),
+    0 1px 0 rgba(0, 0, 0, 0.5);
+  filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.5));
+  z-index: 2;
+}
+
+/* Grid de fichas en la cárcel */
+.jail-pieces {
+  width: 100%;
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 3px;
+  padding: 2px;
+}
+
+/* ===================================
+   LADOS DEL TABLERO - CAMINOS
+   =================================== */
+
+.board-side {
+  display: flex;
+  background: linear-gradient(145deg, #D4A574 0%, #C89B65 50%, #B8885A 100%);
+  border-radius: 4px;
+  padding: 2px;
+  gap: 1px;
+  box-shadow: 
+    inset 0 2px 6px rgba(0, 0, 0, 0.2),
+    inset 0 -1px 3px rgba(255, 255, 255, 0.15);
+  position: relative;
+}
+
+/* Direcciones de los lados */
+.board-side.top {
+  grid-column: 2;
+  grid-row: 1;
+  flex-direction: row;
+}
+
+.board-side.right {
+  grid-column: 3;
+  grid-row: 2;
+  flex-direction: column;
+}
+
+.board-side.bottom {
+  grid-column: 2;
+  grid-row: 3;
+  flex-direction: row;
+}
+
+.board-side.left {
+  grid-column: 1;
+  grid-row: 2;
+  flex-direction: column;
+}
+
+/* ===================================
+   CASILLAS DEL TABLERO
+   =================================== */
+
+.board-cell {
+  flex: 1;
+  aspect-ratio: 1;
+  background: linear-gradient(135deg, #FFF8E7 0%, #F5E6D3 50%, #E8D4BB 100%);
+  border: 2px solid #A67C52;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: all 0.2s ease;
+  box-shadow: 
+    inset 0 1px 2px rgba(255, 255, 255, 0.5),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.1),
+    0 1px 3px rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+/* Casillas de seguro con estrellas */
+.board-cell.safe {
+  background: linear-gradient(135deg, #FFE4B5 0%, #FFD700 50%, #FFC700 100%);
+  border-color: #DAA520;
+  box-shadow: 
+    inset 0 0 12px rgba(255, 215, 0, 0.4),
+    inset 0 1px 2px rgba(255, 255, 255, 0.6),
+    0 2px 6px rgba(218, 165, 32, 0.4),
+    0 0 10px rgba(255, 215, 0, 0.3);
+}
+
+/* Marcador de estrella para casillas seguras */
+.safe-marker {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  font-size: 0.5rem;
+  color: #DAA520;
+  text-shadow: 
+    0 0 2px rgba(255, 215, 0, 0.8),
+    0 1px 1px rgba(0, 0, 0, 0.3);
+  filter: drop-shadow(0 0 2px rgba(255, 215, 0, 0.6));
+  animation: starGlow 2s ease-in-out infinite;
+  z-index: 1;
+}
+
+@keyframes starGlow {
+  0%, 100% { 
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 0.7;
+    transform: scale(1.1);
+  }
+}
+
+/* Contenedor de fichas */
+.pieces-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+/* ===================================
+   FICHAS (Pieces)
+   =================================== */
+
+.piece {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(0, 0, 0, 0.2),
+    inset 0 1px 2px rgba(255, 255, 255, 0.4),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.3),
+    0 0 6px currentColor;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: absolute;
+  cursor: default;
+}
+
+/* Efecto 3D en las fichas */
+.piece::before {
+  content: '';
+  position: absolute;
+  top: 15%;
+  left: 20%;
+  width: 40%;
+  height: 30%;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  filter: blur(3px);
+}
+
+/* Colores de las fichas con gradientes */
+.piece.red {
+  background: radial-gradient(circle at 30% 30%, #FF6B6B, #E63946);
+}
+
+.piece.blue {
+  background: radial-gradient(circle at 30% 30%, #5DADE2, #457B9D);
+}
+
+.piece.yellow {
+  background: radial-gradient(circle at 30% 30%, #F6C453, #F4A261);
+}
+
+.piece.green {
+  background: radial-gradient(circle at 30% 30%, #45D9B8, #2A9D8F);
+}
+
+/* Fichas en la cárcel */
+.piece-in-jail {
+  position: static;
+  width: 100%;
+  height: 100%;
+  max-width: 28px;
+  max-height: 28px;
+  margin: auto;
+  border-width: 2px;
+}
+
+/* Fichas en el camino hacia la meta */
+.piece-in-home {
+  position: static;
+  width: 12px;
+  height: 12px;
+  border-width: 1.5px;
+}
+
+/* Fichas que llegaron a la meta */
+.piece-finished {
+  position: static;
+  width: 10px;
+  height: 10px;
+  opacity: 0.85;
+  border-style: solid;
+  border-width: 1.5px;
+  filter: saturate(0.7);
+}
+
+/* Animación para movimientos válidos */
+.piece.valid-move {
+  cursor: pointer;
+  animation: validMovePulse 1.5s ease-in-out infinite;
+  z-index: 10;
+}
+
+@keyframes validMovePulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 
+      0 3px 8px rgba(0, 0, 0, 0.6),
+      0 0 12px currentColor,
+      0 0 0 3px rgba(255, 255, 255, 0.3);
+  }
+  50% {
+    transform: scale(1.35);
+    box-shadow: 
+      0 6px 16px rgba(0, 0, 0, 0.8),
+      0 0 24px currentColor,
+      0 0 0 5px rgba(255, 255, 255, 0.5);
+  }
+}
+
+.piece.valid-move:hover {
+  transform: scale(1.5);
+  z-index: 15;
+  filter: brightness(1.2);
+}
+
+/* ===================================
+   CENTRO DEL TABLERO - META
+   =================================== */
+
+.board-center {
+  grid-column: 2;
+  grid-row: 2;
+  background: 
+    radial-gradient(circle, rgba(139, 90, 60, 0.2) 0%, transparent 70%),
+    linear-gradient(145deg, #6B4423 0%, #52341F 50%, #3D2817 100%);
+  border-radius: 50%;
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  padding: 6px;
+  gap: 3px;
+  box-shadow: 
+    inset 0 4px 16px rgba(0, 0, 0, 0.6),
+    inset 0 -2px 8px rgba(255, 255, 255, 0.08),
+    0 0 20px rgba(0, 0, 0, 0.4);
+  border: 2px solid rgba(139, 90, 60, 0.5);
+}
+
+/* Forma octagonal en el centro */
+.board-center::before {
+  content: '';
+  position: absolute;
+  top: 15%;
+  left: 15%;
+  right: 15%;
+  bottom: 15%;
+  background: linear-gradient(135deg, 
+    #E63946 0%, #E63946 25%,
+    #F4A261 25%, #F4A261 50%,
+    #2A9D8F 50%, #2A9D8F 75%,
+    #457B9D 75%, #457B9D 100%
+  );
+  clip-path: polygon(
+    30% 0%, 70% 0%,
+    100% 30%, 100% 70%,
+    70% 100%, 30% 100%,
+    0% 70%, 0% 30%
+  );
+  opacity: 0.15;
+  z-index: 0;
+}
+
+/* ===================================
+   CAMINOS DE LLEGADA (Home Paths)
+   =================================== */
+
+.home-path {
+  display: flex;
+  padding: 3px;
+  border-radius: 4px;
+  position: relative;
+  z-index: 1;
+}
+
+.home-path.red {
+  grid-column: 1;
+  grid-row: 2;
+  background: linear-gradient(90deg, 
+    transparent 0%,
+    rgba(230, 57, 70, 0.15) 50%,
+    rgba(230, 57, 70, 0.3) 100%
+  );
+  flex-direction: row;
+  border-right: 3px solid rgba(230, 57, 70, 0.4);
+}
+
+.home-path.blue {
+  grid-column: 2;
+  grid-row: 1;
+  background: linear-gradient(180deg, 
+    transparent 0%,
+    rgba(69, 123, 157, 0.15) 50%,
+    rgba(69, 123, 157, 0.3) 100%
+  );
+  flex-direction: column;
+  border-bottom: 3px solid rgba(69, 123, 157, 0.4);
+}
+
+.home-path.yellow {
+  grid-column: 1;
+  grid-row: 1;
+  background: linear-gradient(90deg, 
+    rgba(244, 162, 97, 0.3) 0%,
+    rgba(244, 162, 97, 0.15) 50%,
+    transparent 100%
+  );
+  flex-direction: row-reverse;
+  border-left: 3px solid rgba(244, 162, 97, 0.4);
+}
+
+.home-path.green {
+  grid-column: 2;
+  grid-row: 2;
+  background: linear-gradient(180deg, 
+    rgba(42, 157, 143, 0.3) 0%,
+    rgba(42, 157, 143, 0.15) 50%,
+    transparent 100%
+  );
+  flex-direction: column-reverse;
+  border-top: 3px solid rgba(42, 157, 143, 0.4);
+}
+
+/* Casillas del camino de llegada */
+.home-cell {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 2px;
+}
+
+/* Zona de finalización en el centro */
+.finish-zone {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: radial-gradient(circle, 
+    rgba(255, 215, 0, 0.15) 0%, 
+    rgba(139, 90, 60, 0.1) 100%
+  );
+  border: 2px solid rgba(218, 165, 32, 0.3);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  padding: 3px;
+  box-shadow: 
+    inset 0 2px 6px rgba(0, 0, 0, 0.3),
+    0 0 15px rgba(255, 215, 0, 0.2);
+  z-index: 5;
+}
+
+/* ===================================
+   LOGO CENTRAL "PARQUÉS"
+   =================================== */
+
+.center-logo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  pointer-events: none;
+  background: radial-gradient(circle, 
+    rgba(139, 90, 60, 0.9) 0%, 
+    rgba(107, 68, 35, 0.95) 100%
+  );
+  padding: 6px 10px;
+  border-radius: 6px;
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(218, 165, 32, 0.4);
+}
+
+.parques-title {
+  font-family: 'Righteous', 'Bebas Neue', cursive;
+  font-size: 0.9rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, 
+    #FFD700 0%, 
+    #FFA500 25%,
+    #FFD700 50%,
+    #FFA500 75%,
+    #FFD700 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 2px;
+  text-shadow: 
+    0 1px 2px rgba(0, 0, 0, 0.8),
+    0 0 10px rgba(255, 215, 0, 0.4);
+  filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.6));
+  animation: logoShine 3s ease-in-out infinite;
+  background-size: 200% 100%;
+}
+
+@keyframes logoShine {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* ===================================
+   DADOS DECORATIVOS
+   =================================== */
+
+.decorative-dice-container {
+  position: absolute;
+  bottom: -12px;
+  right: 10px;
+  display: flex;
+  gap: 5px;
+  z-index: 20;
+}
+
+.decorative-dice {
+  width: 30px;
+  height: 30px;
+  background: linear-gradient(145deg, #FFFFFF, #F0F0F0);
+  border-radius: 5px;
+  box-shadow: 
+    0 3px 6px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* ===================================
+   RESPONSIVE - MOBILE
+   =================================== */
+
+@media (max-width: 768px) {
+  .board-container {
+    max-width: 100%;
+    max-height: 100%;
+    padding: 0.5vh;
+  }
+
+  .board-wrapper {
+    max-width: min(95vh, 95vw);
+    max-height: min(95vh, 95vw);
+    padding: 0.5vh;
+    gap: 0.2vh;
+  }
+
+  .corner {
+    padding: 5px;
+    gap: 3px;
+  }
+
+  .jail {
+    padding: 5px;
+    border-width: 2px;
+  }
+
+  .jail-label {
+    font-size: 0.5rem;
+    letter-spacing: 0.5px;
+  }
+
+  .jail-pieces {
+    gap: 2px;
+  }
+
+  .board-side {
+    padding: 1.5px;
+  }
+
+  .safe-marker {
+    font-size: 0.45rem;
+  }
+
+  .piece {
+    width: 12px;
+    height: 12px;
+    border-width: 1.5px;
+  }
+
+  .piece-in-jail {
+    max-width: 24px;
+    max-height: 24px;
+    border-width: 2px;
+  }
+
+  .piece-in-home {
+    width: 10px;
+    height: 10px;
+  }
+
+  .piece-finished {
+    width: 8px;
+    height: 8px;
+  }
+
+  .board-center {
+    padding: 5px;
+    gap: 2px;
+    border-width: 2px;
+  }
+
+  .home-path {
+    padding: 2px;
+    border-width: 1.5px;
+  }
+
+  .finish-zone {
+    width: 25px;
+    height: 25px;
+    gap: 1px;
+    padding: 2px;
+    border-width: 1.5px;
+  }
+
+  .center-logo {
+    padding: 4px 8px;
+  }
+
+  .parques-title {
+    font-size: 0.7rem;
+    letter-spacing: 1px;
+  }
+
+  .decorative-dice-container {
+    bottom: -10px;
+    right: 6px;
+    gap: 4px;
+  }
+
+  .decorative-dice {
+    width: 24px;
+    height: 24px;
+    font-size: 1rem;
+    border-radius: 4px;
+  }
+}
+
+@media (max-width: 480px) {
+  .board-container {
+    padding: 0.3vh;
+  }
+
+  .board-wrapper {
+    max-width: min(98vh, 98vw);
+    max-height: min(98vh, 98vw);
+    padding: 0.3vh;
+    gap: 0.15vh;
+  }
+
+  .corner {
+    padding: 4px;
+    gap: 2px;
+  }
+
+  .jail {
+    padding: 4px;
+    border-width: 1.5px;
+  }
+
+  .jail-label {
+    font-size: 0.45rem;
+    letter-spacing: 0.3px;
+  }
+
+  .jail-pieces {
+    gap: 1.5px;
+  }
+
+  .piece {
+    width: 10px;
+    height: 10px;
+    border-width: 1px;
+  }
+
+  .piece-in-jail {
+    max-width: 20px;
+    max-height: 20px;
+    border-width: 1.5px;
+  }
+
+  .piece-in-home {
+    width: 8px;
+    height: 8px;
+  }
+
+  .piece-finished {
+    width: 7px;
+    height: 7px;
+  }
+
+  .board-center {
+    padding: 4px;
+    gap: 1.5px;
+    border-width: 1.5px;
+  }
+
+  .home-path {
+    padding: 1.5px;
+  }
+
+  .finish-zone {
+    width: 20px;
+    height: 20px;
+    border-width: 1px;
+  }
+
+  .center-logo {
+    padding: 3px 6px;
+  }
+
+  .parques-title {
+    font-size: 0.55rem;
+    letter-spacing: 0.8px;
+  }
+
+  .decorative-dice-container {
+    bottom: -8px;
+    right: 4px;
+    gap: 3px;
+  }
+
+  .decorative-dice {
+    width: 20px;
+    height: 20px;
+    font-size: 0.85rem;
+    border-radius: 3px;
+  }
+}
+
+@media (max-width: 360px) {
+  .board-container {
+    padding: 0.2vh;
+  }
+
+  .board-wrapper {
+    max-width: min(99vh, 99vw);
+    max-height: min(99vh, 99vw);
+    padding: 0.2vh;
+    gap: 0.1vh;
+  }
+
+  .piece {
+    width: 8px;
+    height: 8px;
+  }
+
+  .piece-in-jail {
+    max-width: 16px;
+    max-height: 16px;
+  }
+
+  .parques-title {
+    font-size: 0.5rem;
+    letter-spacing: 0.5px;
+  }
+
+  .jail-label {
+    font-size: 0.4rem;
+  }
+
+  .decorative-dice {
+    width: 16px;
+    height: 16px;
+    font-size: 0.7rem;
+  }
+}
+
+/* ===================================
+   EFECTOS ADICIONALES Y BRILLO
+   =================================== */
+
+/* Brillo en el tablero */
+.board-wrapper::after {
+  content: '';
+  position: absolute;
+  top: -5%;
+  left: -5%;
+  width: 50%;
+  height: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+/* Sombra suave en las esquinas del tablero */
+.board-container::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+}

@@ -45,6 +45,7 @@ export const useGameSocket = () => {
   const [validMoves, setValidMoves] = useState<Move[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isReconnecting, setIsReconnecting] = useState(false);
+  const [_lastPlayerIndex, setLastPlayerIndex] = useState<number>(-1);
 
   useEffect(() => {
     const newSocket = io(SOCKET_URL);
@@ -72,11 +73,21 @@ export const useGameSocket = () => {
     });
 
     newSocket.on('gameState', (game: GameState) => {
+      // Detectar cambio de turno y resetear dados
+      setLastPlayerIndex(prev => {
+        if (prev !== -1 && prev !== game.currentPlayerIndex) {
+          // El turno cambió, resetear dados y movimientos válidos
+          setDiceRoll(null);
+          setValidMoves([]);
+        }
+        return game.currentPlayerIndex;
+      });
       setGameState(game);
     });
 
     newSocket.on('gameStarted', (game: GameState) => {
       setGameState(game);
+      setLastPlayerIndex(game.currentPlayerIndex);
     });
 
     newSocket.on('diceRolled', ({ diceRoll: roll, validMoves: moves }) => {
