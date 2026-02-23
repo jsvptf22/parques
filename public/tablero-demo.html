@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tablero de Parqués - Demo</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+      font-family: 'Arial', sans-serif;
+      padding: 1rem;
+    }
+
+    /* Contenedor del tablero */
+    .board-container {
+      width: 100%;
+      max-width: min(95vh, 95vw);
+      aspect-ratio: 1 / 1;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      gap: 0;
+      background: #ffffff;
+      border: 4px solid #333;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    /* ===== ESQUINAS - CÁRCELES ===== */
+    .corner {
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #333;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .corner.yellow {
+      grid-column: 1;
+      grid-row: 1;
+      border-bottom-right-radius: 100%;
+      border-right: none;
+      border-bottom: none;
+    }
+
+    .corner.blue {
+      grid-column: 3;
+      grid-row: 1;
+      border-bottom-left-radius: 100%;
+      border-left: none;
+      border-bottom: none;
+    }
+
+    .corner.red {
+      grid-column: 1;
+      grid-row: 3;
+      border-top-right-radius: 100%;
+      border-right: none;
+      border-top: none;
+    }
+
+    .corner.green {
+      grid-column: 3;
+      grid-row: 3;
+      border-top-left-radius: 100%;
+      border-left: none;
+      border-top: none;
+    }
+
+    /* Cárceles circulares */
+    .jail {
+      width: 80%;
+      height: 80%;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 1rem;
+      box-shadow: 
+        0 4px 12px rgba(0, 0, 0, 0.3),
+        inset 0 2px 8px rgba(255, 255, 255, 0.3);
+      border: 4px solid rgba(0, 0, 0, 0.1);
+    }
+
+    .jail.yellow { background: linear-gradient(135deg, #ffd43b 0%, #fcc419 100%); }
+    .jail.blue { background: linear-gradient(135deg, #4dabf7 0%, #339af0 100%); }
+    .jail.red { background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%); }
+    .jail.green { background: linear-gradient(135deg, #51cf66 0%, #37b24d 100%); }
+
+    .jail-label {
+      font-size: 1rem;
+      font-weight: bold;
+      color: white;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    .jail-grid {
+      width: 100%;
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 8px;
+      padding: 4px;
+    }
+
+    .piece {
+      width: 100%;
+      height: 100%;
+      max-width: 40px;
+      max-height: 40px;
+      border-radius: 50%;
+      border: 3px solid rgba(255, 255, 255, 0.9);
+      box-shadow: 
+        0 2px 6px rgba(0, 0, 0, 0.4),
+        inset 0 1px 3px rgba(255, 255, 255, 0.5);
+      margin: auto;
+    }
+
+    .piece.yellow { background: linear-gradient(135deg, #ffd43b 0%, #fcc419 100%); }
+    .piece.blue { background: linear-gradient(135deg, #4dabf7 0%, #339af0 100%); }
+    .piece.red { background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%); }
+    .piece.green { background: linear-gradient(135deg, #51cf66 0%, #37b24d 100%); }
+
+    /* ===== PASILLOS ===== */
+    .corridor {
+      background: #fff;
+      border: 2px solid #333;
+      display: flex;
+      position: relative;
+    }
+
+    .corridor.top {
+      grid-column: 2;
+      grid-row: 1;
+      flex-direction: column;
+      border-left: none;
+      border-right: none;
+    }
+
+    .corridor.right {
+      grid-column: 3;
+      grid-row: 2;
+      flex-direction: row;
+      border-top: none;
+      border-bottom: none;
+    }
+
+    .corridor.bottom {
+      grid-column: 2;
+      grid-row: 3;
+      flex-direction: column;
+      border-left: none;
+      border-right: none;
+    }
+
+    .corridor.left {
+      grid-column: 1;
+      grid-row: 2;
+      flex-direction: row;
+      border-top: none;
+      border-bottom: none;
+    }
+
+    /* ===== CARRILES (3 por pasillo) ===== */
+    .lane {
+      flex: 1;
+      display: flex;
+      position: relative;
+    }
+
+    .lane.exit { background: #f8f9fa; }
+    .lane.entry { background: #f8f9fa; }
+
+    /* Carriles centrales coloreados */
+    .lane.center.yellow { background: linear-gradient(180deg, rgba(255, 212, 59, 0.3), rgba(255, 212, 59, 0.6)); }
+    .lane.center.blue { background: linear-gradient(90deg, rgba(77, 171, 247, 0.3), rgba(77, 171, 247, 0.6)); }
+    .lane.center.red { background: linear-gradient(180deg, rgba(255, 107, 107, 0.3), rgba(255, 107, 107, 0.6)); }
+    .lane.center.green { background: linear-gradient(270deg, rgba(81, 207, 102, 0.3), rgba(81, 207, 102, 0.6)); }
+
+    /* ===== CASILLAS ===== */
+    .cell {
+      flex: 1;
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #dee2e6;
+      position: relative;
+      background: #fff;
+      min-width: 15px;
+      min-height: 15px;
+    }
+
+    .cell.safe {
+      background: radial-gradient(circle, #fff3bf 0%, #ffe066 100%);
+      box-shadow: inset 0 0 8px rgba(255, 193, 7, 0.5);
+    }
+
+    .cell.safe::before {
+      content: '★';
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      font-size: 0.6rem;
+      color: #ffa000;
+    }
+
+    /* Etiquetas */
+    .label {
+      position: absolute;
+      font-size: 0.45rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .label.salida { color: #228be6; }
+    .label.seguro { color: #ffa000; }
+    .label.llegada { color: #37b24d; }
+
+    /* Rotación de etiquetas */
+    .corridor.top .label { transform: rotate(90deg); }
+    .corridor.right .label { transform: rotate(0deg); }
+    .corridor.bottom .label { transform: rotate(-90deg); }
+    .corridor.left .label { transform: rotate(180deg); }
+
+    /* ===== CENTRO ===== */
+    .center {
+      grid-column: 2;
+      grid-row: 2;
+      background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+      border: 2px solid #333;
+      border-radius: 50%;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 4px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .logo {
+      width: 60%;
+      height: 60%;
+      border-radius: 50%;
+      background: 
+        radial-gradient(circle at 30% 40%, rgba(255, 255, 255, 0.95) 0%, rgba(200, 220, 255, 0.8) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      position: relative;
+      z-index: 10;
+    }
+
+    /* Nubes decorativas */
+    .logo::before {
+      content: '☁';
+      position: absolute;
+      top: 20%;
+      left: 15%;
+      font-size: 1.5rem;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .logo::after {
+      content: '☁';
+      position: absolute;
+      bottom: 25%;
+      right: 20%;
+      font-size: 1.2rem;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .title {
+      font-family: 'Arial Black', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 900;
+      color: #495057;
+      letter-spacing: 2px;
+      text-shadow: 
+        2px 2px 0 #fff,
+        -1px -1px 0 #fff,
+        0 2px 4px rgba(0, 0, 0, 0.3);
+      z-index: 11;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .jail-label { font-size: 0.8rem; }
+      .title { font-size: 0.9rem; }
+      .label { font-size: 0.35rem !important; }
+    }
+
+    @media (max-width: 480px) {
+      .jail-label { font-size: 0.6rem; }
+      .title { font-size: 0.7rem; letter-spacing: 1px; }
+      .label { font-size: 0.3rem !important; }
+      .cell.safe::before { font-size: 0.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="board-container">
+    <!-- Esquina Amarilla (Superior Izquierda) -->
+    <div class="corner yellow">
+      <div class="jail yellow">
+        <div class="jail-label">Amarillo</div>
+        <div class="jail-grid">
+          <div class="piece yellow"></div>
+          <div class="piece yellow"></div>
+          <div class="piece yellow"></div>
+          <div class="piece yellow"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pasillo Superior (Amarillo) -->
+    <div class="corridor top">
+      <div class="lane exit">
+        <div class="cell"><span class="label salida">Salida</span></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell safe"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell safe"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+      </div>
+      <div class="lane center yellow">
+        <div class="cell"><span class="label llegada">Llegada</span></div>
+        <div class="cell"><span class="label llegada">Llegada</span></div>
+        <div class="cell"><span class="label llegada">Llegada</span></div>
+        <div class="cell"><span class="label llegada">Llegada</span></div>
+        <div class="cell"><span class="label llegada">Llegada</span></div>
+        <div class="cell"><span class="label llegada">Llegada</span></div>
+        <div class="cell"><span class="label llegada">Llegada</span></div>
+        <div class="cell"><span class="label llegada">Llegada</span></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+      </div>
+      <div class="lane entry">
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell safe"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell safe"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+      </div>
+    </div>
+
+    <!-- Esquina Azul (Superior Derecha) -->
+    <div class="corner blue">
+      <div class="jail blue">
+        <div class="jail-label">Azul</div>
+        <div class="jail-grid">
+          <div class="piece blue"></div>
+          <div class="piece blue"></div>
+          <div class="piece blue"></div>
+          <div class="piece blue"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pasillo Izquierdo (Verde) -->
+    <div class="corridor left">
+      <div class="lane exit">
+        <div class="cell"><span class="label salida">Salida</span></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell safe"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell safe"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+      </div>
+      <div class="lane center green">
+        <div class="cell"><span class="label llegada">Llegada</span></div>
+        <div class="cell"><span class="label llegada">Llegada</span></div>
+        <div class="cell"><span class="label llegada">Llegada</span></div>
+        <div class="cell"><span class="label llegada">Llegada</span></div>
+        <div class="cell"><span class="label llegada">Llegada</span></div>
+        <div class="cell"><span class="label llegada">Llegada</span></div>
+        <div class="cell"><span class="label llegada">Llegada</span></div>
+        <div class="cell"><span class="label llegada">Llegada</span></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+      </div>
+      <div class="lane entry">
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell safe"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell safe"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+      </div>
+    </div>
+
+    <!-- Centro del Tablero -->
+    <div class="center">
+      <div class="logo">
+        <div class="title">PARQUÉS</div>
+      </div>
+    </div>
+
+    <!-- Pasillo Derecho (Azul) -->
+    <div class="corridor right">
+      <div class="lane exit">
+        <div class="cell"><span class="label salida">Salida</span></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell safe"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell safe"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+      </div>
+      <div class="lane center blue">
+        <div class="cell"><span class="label llegada">Llegada</span></div>
+        <div class="cell"><span class="label llegada">Llegada</span></div>
+        <div class="cell"><span class="label llegada">Llegada</span></div>
+        <div class="cell"><span class="label llegada">Llegada</span></div>
+        <div class="cell"><span class="label llegada">Llegada</span></div>
+        <div class="cell"><span class="label llegada">Llegada</span></div>
+        <div class="cell"><span class="label llegada">Llegada</span></div>
+        <div class="cell"><span class="label llegada">Llegada</span></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+      </div>
+      <div class="lane entry">
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell safe"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell safe"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+      </div>
+    </div>
+
+    <!-- Esquina Roja (Inferior Izquierda) -->
+    <div class="corner red">
+      <div class="jail red">
+        <div class="jail-label">Rojo</div>
+        <div class="jail-grid">
+          <div class="piece red"></div>
+          <div class="piece red"></div>
+          <div class="piece red"></div>
+          <div class="piece red"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pasillo Inferior (Rojo) -->
+    <div class="corridor bottom">
+      <div class="lane exit">
+        <div class="cell"><span class="label salida">Salida</span></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell safe"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell safe"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+      </div>
+      <div class="lane center red">
+        <div class="cell"><span class="label llegada">Llegada</span></div>
+        <div class="cell"><span class="label llegada">Llegada</span></div>
+        <div class="cell"><span class="label llegada">Llegada</span></div>
+        <div class="cell"><span class="label llegada">Llegada</span></div>
+        <div class="cell"><span class="label llegada">Llegada</span></div>
+        <div class="cell"><span class="label llegada">Llegada</span></div>
+        <div class="cell"><span class="label llegada">Llegada</span></div>
+        <div class="cell"><span class="label llegada">Llegada</span></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+      </div>
+      <div class="lane entry">
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell safe"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell safe"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+      </div>
+    </div>
+
+    <!-- Esquina Verde (Inferior Derecha) -->
+    <div class="corner green">
+      <div class="jail green">
+        <div class="jail-label">Verde</div>
+        <div class="jail-grid">
+          <div class="piece green"></div>
+          <div class="piece green"></div>
+          <div class="piece green"></div>
+          <div class="piece green"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import "./App.css";
-import Board from "./components/Board";
+import Board4 from "./components/Board4";
 import { useGameSocket } from "./hooks/useGameSocket";
 
 function App() {
@@ -73,7 +73,7 @@ function App() {
   };
 
   const handleStartGame = () => {
-    if (gameState && gameState.players.length >= 2) {
+    if (gameState && gameState.players.length >= 1) {
       startGame(gameState.id);
     }
   };
@@ -234,7 +234,7 @@ function App() {
           </div>
 
           {gameState &&
-            gameState.players.length >= 2 &&
+            gameState.players.length >= 1 &&
             !gameState.gameStarted && (
               <button
                 onClick={handleStartGame}
@@ -244,7 +244,7 @@ function App() {
               </button>
             )}
 
-          {gameState && gameState.players.length < 2 && (
+          {gameState && gameState.players.length < 1 && (
             <p className="waiting-text">Esperando más jugadores...</p>
           )}
         </div>
@@ -341,36 +341,7 @@ function App() {
       </div>
 
       <div className="game-content">
-        {gameState && (
-          <Board
-            players={gameState.players}
-            currentPlayerIndex={gameState.currentPlayerIndex}
-            onPieceClick={handlePieceClick}
-            validMoves={validMoves}
-            currentPlayerId={currentPlayer?.id}
-          />
-        )}
-      </div>
-
-      <div className="players-sidebar">
-        {gameState?.players.map((player) => (
-          <div
-            key={player.id}
-            className={`player-status ${player.id === currentPlayer?.id ? "you" : ""}`}
-            style={{ borderColor: getColorHex(player.color) }}
-          >
-            <div className="player-status-header">
-              <div
-                className="player-color-dot"
-                style={{ backgroundColor: getColorHex(player.color) }}
-              ></div>
-              <span className="player-status-name">{player.name}</span>
-            </div>
-            <div className="player-pieces-status">
-              {player.pieces.filter((p) => p.isFinished).length}/4 en meta
-            </div>
-          </div>
-        ))}
+        <Board4 />
       </div>
     </div>
   );
